@@ -1,30 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
+ 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href=
+"https://fonts.googleapis.com">
+    <link rel="preconnect" href=
+"https://fonts.gstatic.com" crossorigin>
+    <link href=
+"https://fonts.googleapis.com/css2?family=Balsamiq+Sans&display=swap"
+          rel="stylesheet">
     <title>Simon Game</title>
-    <link rel="stylesheet" href="style.css" />
+    
+    <link href="style.css" rel="stylesheet">
     
 </head>
+ 
 <body>
-   
-    <h1>Simon Says Game</h1>
-    <h2>Press any key to start the game</h2>
-
-    <div class="btn-container">
-        <div class="line one">
-            <div class="btn red" type="button" id="red">1</div>
-            <div class="btn yellow" type="button" id="yellow">2</div>
-        </div>
-        
-        <div class="line two">
-        <div class="btn green" type="button" id="green">3</div>
-        <div class="btn purple" type="button" id="purple">4</div>
-        </div>
+    <h1>Simon Game</h1>
+    <div id="controls">
+        <label for="strict-mode">Strict Mode</label>
+        <input type="checkbox" id="strict-mode"
+               onchange="toggleStrictMode()">
     </div>
-
-    <script src="app.js"></script>
+ 
+    <div id="simon-board">
+        <button class="simon-btn top-left"
+                onclick="handleClick(this)"
+        data-color="1" disabled></button>
+        <button class="simon-btn top-right"
+                onclick="handleClick(this)"
+        data-color="2" disabled></button>
+        <button class="simon-btn bottom-left"
+                onclick="handleClick(this)"
+        data-color="3" disabled></button>
+        <button class="simon-btn bottom-right"
+                onclick="handleClick(this)"
+        data-color="4" disabled></button>
+    </div>
+ 
+    <div id="level">
+        <span>Level: 
+              <span class="level-count">-</span>
+          </span>
+    </div>
+    <button id="power-btn"
+            onclick="togglePower()">Start</button>
     
+            <!-- JavaScript -->
+    <script src="app.js"></script>
 </body>
+ 
 </html>
