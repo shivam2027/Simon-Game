@@ -1,94 +1,137 @@
-let gameSeq = [];
-let userSeq = [];
-
-let btns = ["yellow","red","purple","green"];
-
-let started = false;
-let level =0 ;
-
-let h2 = document.querySelector("h2");
-
-document.addEventListener("keypress" , function () {
-    if(started == false) {
-        console.log("game is started");
-        started = true;
-
-        levelUp();
-    }
-});
-
-function gameFlash(btn) {
-    btn.classList.add("flash");
-
-    setTimeout(function () {
-        btn.classList.remove("flash");
-    }, 250);
-}
-
-function userFlash(btn) {
-    btn.classList.add("userflash");
-
-    setTimeout(function () {
-        btn.classList.remove("userflash");
-    }, 250);
-}
-
-function levelUp() {
-    userSeq = [];
-    level++;
-    h2.innerText = `Level ${level}`;
-
-    //random btn choose
-    let randIdx = Math.floor(Math.random() *3);
-    let randColor = btns[randIdx];
-    let randbtn = document.querySelector(`.${randColor}`);
-    // console.log(randColor);
-    // console.log(randIdx);
-    // console.log(randbtn);
-    gameSeq.push(randColor);
-    console.log(gameSeq);
-    gameFlash(randbtn);
-}
-
-function checkAns(idx) {
-    //console.log("curr level : ", level);
-
-    if(userSeq[idx]===gameSeq[idx]) {
-        if(userSeq.length == gameSeq.length) {
-            setTimeout(levelUp,1000);
+let strictMode = false;
+        let powerOn = false;
+        const sequence = [];
+        let userSequence = [];
+        let level = 1;
+ 
+        const levelCount = document.querySelector('.level-count');
+ 
+        function startGame() {
+            sequence.length = 0;
+            userSequence.length = 0;
+            level = 1;
+            levelCount.textContent = level;
+            nextRound();
+            document.getElementById("start-btn").disabled = true;
+            document.getElementById("power-btn").disabled = false;
         }
-    } else {
-        h2.innerHTML = `Game over!<br>
-        Your score was <b> ${level} </b> <br>
-        Press any key to start the game`;
-        document.querySelector("body").style.backgroundColor = "red";
-        setTimeout( function() {
-            document.querySelector("body").style.backgroundColor = "white";
-        }, 150);
-        reset();
-    }
-}
-
-function btnPress() {
-    let btn = this;
-    userFlash(btn);
-
-    userColor = btn.getAttribute("id");
-    userSeq.push(userColor);
-
-    checkAns(userSeq.length-1);
-
-}
-
-let allBtns = document.querySelectorAll(".btn");
-for(btn of allBtns) {
-    btn.addEventListener("click", btnPress);
-}
-
-function reset() {
-    started=false;
-    gameSeq = [];
-    userSeq = [];
-    level = 0;
-
-}
+ 
+        function nextRound() {
+            addToSequence();
+            playSequence();
+        }
+ 
+        function addToSequence() {
+            const randomColor = Math.floor(Math.random() * 4) + 1;
+            sequence.push(randomColor);
+        }
+ 
+        function playSequence() {
+            let i = 0;
+            const intervalId = setInterval(() => {
+                highlightButton(sequence[i]);
+                i++;
+                if (i >= sequence.length) {
+                    clearInterval(intervalId);
+                    enableButtons();
+                }
+            }, 1000);
+        }
+ 
+        function handleClick(button) {
+            if (powerOn) {
+                const userColor = button.getAttribute("data-color");
+                userSequence.push(Number(userColor));
+                highlightButton(userColor);
+                if (!checkSequence()) {
+                    if (strictMode) {
+                        alert(`Game over! Press Start to retry 
+                        from level 1.\nFINAL SCORE: ${level}`);
+                        togglePower();
+                        startGame();
+                    } else {
+                        alert(`Wrong sequence! Press Start to try again
+                         from current level.\nFINAL SCORE: ${level}`);
+                        userSequence = [];
+                        document.getElementById('power-btn')
+                        .addEventListener('click', () => {
+                            playSequence();
+                        })
+                    }
+                } else if (userSequence.length === sequence.length) {
+                    userSequence = [];
+                    level++;
+                    levelCount.textContent = level;
+                    /*Can change level as per convenience or if we want the game to 
+                    continue indefinitely, can omit if-else condition */
+                    if (level <= 20) {
+                        setTimeout(() => nextRound(), 1000);
+                    } else {
+                        alert("Congratulations! You won!");
+                        startGame();
+                    }
+                }
+            }
+        }
+ 
+        function checkSequence() {
+            for (let i = 0; i < userSequence.length; i++) {
+                if (userSequence[i] !== sequence[i]) {
+                    return false;
+                }
+            }
+            return true;
+        }
+ 
+        function highlightButton(color) {
+            const button = document
+            .querySelector(`[data-color="${color}"]`);
+            if (Number(color) == 1) {
+                button.style.backgroundColor = 'lightgreen'
+            }
+            else if (Number(color) == 2) {
+                button.style.backgroundColor = 'tomato'
+            }
+            else if (Number(color) == 3) {
+                button.style.backgroundColor = 'yellow'
+            }
+            else if (Number(color) == 4) {
+                button.style.backgroundColor = 'lightskyblue'
+            }
+            setTimeout(() => {
+                button.attributes.removeNamedItem('style');
+            }, 300);
+        }
+ 
+        function enableButtons() {
+            const buttons = document
+            .querySelectorAll('.simon-btn');
+            buttons.forEach(button => 
+            button.removeAttribute('disabled'));
+        }
+ 
+        function disableButtons() {
+            const buttons = document
+            .querySelectorAll('.simon-btn');
+            buttons.forEach(button => 
+            button.setAttribute('disabled', 'true'));
+        }
+ 
+        function toggleStrictMode() {
+            strictMode = !strictMode;
+        }
+ 
+        function togglePower() {
+            powerOn = !powerOn;
+            if (powerOn) {
+                startGame();
+                enableButtons();
+                document.getElementById("start-btn")
+                .disabled = false;
+            } else {
+                userSequence = [];
+                disableButtons();
+                document.getElementById("start-btn")
+                .disabled = true;
+            }
+        }
